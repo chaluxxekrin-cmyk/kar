@@ -1,0 +1,143 @@
+-- LocalScript ใน StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- =========================
+--       ตั้งค่า
+-- =========================
+local NPC_FOLDER = workspace:WaitForChild("NPCSpawns")
+
+local SPEED          = 25   -- ⚡ ความเร็วทวีน (studs/sec)
+local ATTACK_DAMAGE  = 20   -- ดาเมจต่อ hit (โหมดเทส)
+local ATTACK_DELAY   = 0.4  -- ดีเลย์ระหว่างตี
+local ATTACK_RANGE   = 6    -- ระยะตี
+
+-- =========================
+--  โหลดตัวละครเรา
+-- =========================
+local function getCharacter()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hrp  = char:WaitForChild("HumanoidRootPart")
+    local hum  = char:WaitForChild("Humanoid")
+    return char, hrp, hum
+end
+
+local char, hrp, playerHumanoid = getCharacter()
+
+local function isPlayerAlive()
+    return playerHumanoid and playerHumanoid.Health > 0 and playerHumanoid.Parent ~= nil
+end
+
+-- ถ้ารีสปอว์น อัปเดตตัวแปร
+LocalPlayer.CharacterAdded:Connect(function(c)
+    char = c
+    hrp = c:WaitForChild("HumanoidRootPart")
+    playerHumanoid = c:WaitForChild("Humanoid")
+end)
+
+-- =========================
+--  หาเป้าหมายถัดไป
+-- =========================
+local function getNextTarget()
+    for _, spawn in ipairs(NPC_FOLDER:GetChildren()) do
+        local npc = spawn:FindFirstChild("Low Rank Aogiri Member")
+        if npc then
+            local hum  = npc:FindFirstChildOfClass("Humanoid")
+            local root = npc:FindFirstChild("HumanoidRootPart")
+
+            if hum and root and hum.Health > 0 then
+                return npc, hum, root
+            end
+        end
+    end
+    return nil
+end
+
+-- =========================
+--  ทวีนด้วย "สปีดคงที่"
+-- =========================
+local function tweenToTargetWithSpeed(targetRoot, speed)
+    if not isPlayerAlive() then return false end
+    if not targetRoot or targetRoot.Parent == nil then return false end
+
+    local distance  = (hrp.Position - targetRoot.Position).Magnitude
+    local tweenTime = distance / speed
+
+    local info = TweenInfo.new(
+        tweenTime,
+        Enum.EasingStyle.Linear,
+        Enum.EasingDirection.Out
+    )
+
+    local goal = {
+        CFrame = CFrame.new(targetRoot.Position)
+    }
+
+    local tween = TweenService:Create(hrp, info, goal)
+    tween:Play()
+    tween.Completed:Wait()
+
+    return true
+end
+
+-- =========================
+--  ระยะตี
+-- =========================
+local function isInRange(targetRoot)
+    return (hrp.Position - targetRoot.Position).Magnitude <= ATTACK_RANGE
+end
+
+-- =========================
+--  ตีจนกว่าเป้าหมายจะตาย
+-- =========================
+local function attackUntilDead(npc, hum, targetRoot)
+    while true do
+        if not isPlayerAlive() then return end
+        if not npc or npc.Parent == nil then return end
+        if not hum or hum.Parent == nil then return end
+        if hum.Health <= 0 then return end
+
+        -- ไม่อยู่ในระยะ → วิ่งเข้าใหม่
+        if not isInRange(targetRoot) then
+            tweenToTargetWithSpeed(targetRoot, SPEED)
+        end
+
+        -- ตรงนี้ “ตี”
+        hum:TakeDamage(ATTACK_DAMAGE)
+        task.wait(ATTACK_DELAY)
+    end
+end
+
+-- =========================
+--  ลูปหลัก
+-- =========================
+print("Auto Hunt เริ่มทำงาน…")
+
+while true do
+    if not isPlayerAlive() then
+        warn("ผู้เล่นตาย → หยุดลูป")
+        break
+    end
+
+    local npc, hum, root = getNextTarget()
+    if not npc then
+        warn("ไม่มีเป้าหมายเหลือแล้ว")
+        break
+    end
+
+    print("ล็อกเป้าหมาย:", npc.Name)
+
+    -- วิ่งด้วยความเร็วคงที่
+    tweenToTargetWithSpeed(root, SPEED)
+
+    -- ตี
+    attackUntilDead(npc, hum, root)
+
+    print("เป้าหมายตายแล้ว → เปลี่ยนเป้าใหม่")
+    task.wait(0.2)
+end
+
+print("Auto Hunt จบการทำงาน")
