@@ -10,8 +10,8 @@ local LocalPlayer = Players.LocalPlayer
 -- =========================
 local NPC_FOLDER = workspace:WaitForChild("NPCSpawns")
 
-local SPEED          = 25   -- ⚡ ความเร็วทวีน (studs/sec)
-local ATTACK_DAMAGE  = 20   -- ดาเมจต่อ hit (โหมดเทส)
+local SPEED          = 80   -- ⚡ ความเร็วทวีน (studs/sec)
+local ATTACK_DAMAGE  = 40   -- ดาเมจต่อ hit (โหมดเทส)
 local ATTACK_DELAY   = 0.4  -- ดีเลย์ระหว่างตี
 local ATTACK_RANGE   = 6    -- ระยะตี
 
