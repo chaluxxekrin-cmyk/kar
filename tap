@@ -41,7 +41,7 @@ end
 local Button = Tab:CreateButton({
     Name = "Auto Farm",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/chaluxxekrin-cmyk/kar/refs/heads/main/rog",true))()
+        loadstring(game:"https://raw.githubusercontent.com/chaluxxekrin-cmyk/kar/refs/heads/main/rog",true))()
     print(Selected)
 end
 })
