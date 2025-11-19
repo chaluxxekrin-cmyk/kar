@@ -1,0 +1,47 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({ 
+    Name = "Rayfield Example Window",
+    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+    LoadingTitle = "Rayfield Interface Suite",
+    LoadingSubtitle = "by Sirius",
+    ShowText = "Rayfield", -- for mobile users to unhide rayfield, change if you'd like
+    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+    ToggleUIKeybind = "K"
+})
+
+local Tab = Window:CreateTab("Gay Femboy", "banknote")
+
+local Selected = {}
+local Gay_Femboy
+
+Gay_Femboy = Tab:CreateDropdown({
+    Name = "Gay Femboy List",
+    Options = {"Pimai","กมลชนก","สมนึก"},
+    CurrentOption = {"กมลชนก"},
+    MultipleOptions = true,
+    Flag = "Pimai Is Gay", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Options)
+        Selected = Options
+            for _ , i in ipairs(Selected) do
+                print(i)
+        end
+    end
+})
+
+local Button = Tab:CreateButton({
+    Name = "Refresh Gay Femboy",
+    Callback = function()
+    Gay_Femboy:Set({"none"}) -- The new list of options
+   -- The function that takes place when the button is pressed
+   print(Selected)
+end
+})
+
+local Button = Tab:CreateButton({
+    Name = "Auto Farm",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/chaluxxekrin-cmyk/kar/refs/heads/main/rog",true))()
+    print(Selected)
+end
+})
